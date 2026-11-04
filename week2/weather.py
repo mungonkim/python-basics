@@ -118,9 +118,9 @@ def fetch_current(
         raise WeatherError("시간 초과 오류") from e
 
     except httpx.HTTPStatusError as e:
-        status_coude = e.response.status_code
+        status_code = e.response.status_code
 
-        if 400 <= status_coude < 500:
+        if 400 <= status_code < 500:
             raise WeatherError("요청 오류") from e
 
         raise WeatherError("서버 오류") from e
@@ -164,12 +164,6 @@ def main(argv: list[str]) -> int:
         return 2
 
     try:
-        build_params(latitude, longitude)
-    except ValueError as e:
-        print(f"오류: {e}")
-        return 2
-
-    try:
         with httpx.Client() as client:
             weather = fetch_current(client, latitude, longitude)
 
@@ -177,6 +171,10 @@ def main(argv: list[str]) -> int:
         print(format_weather(weather))
         return 0
 
+    except ValueError as e:
+        print(f"오류: {e}")
+        return 2
+    
     except WeatherError as e:
         print(f"오류: {e}")
         return 1
